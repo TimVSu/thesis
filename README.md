@@ -12,3 +12,5 @@ The program has three main functions, creating a textual dataset, creating a tim
   - The result are a timeseries_filename_TRAIN.tsv and timeseries_filename_TEST files that fit the structure required by the framework of Fawaz et al. (https://github.com/hfawaz/dl-4-tsc.git)
 - To run a BERT classifier run python main.py --run_BERT and specify --test_dataset_dir "directory of the test dataset" and --train_dataset_dir "directory of the training dataset"
 - Further customization such as a grid search, specifying hyperparameters etc. are available, run python main.py --help for more info
+- some further utilities and plots that have been used for the project can be found in plots.py and utils.py 
+- the list of stopwords for the wordcloud generation in the thesis can be pulled from https://gist.githubusercontent.com/ZohebAbai/513218c3468130eacff6481f424e4e64/raw/b70776f341a148293ff277afa0d0302c8c38f7e2/gist_stopwords.txt
