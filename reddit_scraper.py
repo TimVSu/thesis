@@ -43,9 +43,8 @@ def getSubUsers(targetName, limit):
     print('found users: ', iterator)
     return iterator
 
-def isTargetUser(user, targetIds, commentBodys, keywords):
-    if(True in [textContainsKeywords(body, keywords) for body in commentBodys]):
-        return classification.UNCLEAR
+def isTargetUser(user, targetIds):
+
     index = 0
     allcomments = user.comments.hot(limit=350)
     for comment in allcomments:
@@ -121,7 +120,7 @@ def getTextualUserData(user, path, testPath, targetIds, keywords, limit=1000, ba
             if(isTarget):
                 saveTextualData(usableComments, userName, targetPath)
             else:            
-                potTarget = isTargetUser(user, targetIds, usableComments, keywords)
+                potTarget = isTargetUser(user, targetIds)
                 if(potTarget == classification.TARGET):
                     saveTextualData(usableComments, userName, targetPath)
                 elif(potTarget == classification.NON_TARGET):
@@ -156,7 +155,7 @@ def getTimeseriesUserData(user, targetIds, keywords, limit=1000, batchSize=400, 
             if(isTarget):
                 return commentTimestamps, True, userName
             else:            
-                potTarget = isTargetUser(user, targetIds, commentTimestamps, keywords)
+                potTarget = isTargetUser(user, targetIds)
                 if(potTarget == classification.TARGET):
                     return commentTimestamps, True, userName
                 elif(potTarget == classification.NON_TARGET):
@@ -172,13 +171,13 @@ def saveTextualData(dataArray, userName, path):
     with open(filePath, 'w') as f:
         f.write(commentString)
 
-def createTimeSeriesList(targetSubName, nonTargetSubNames, sizeGoal, comparisonSubNames, keywords, commentLimit, batchSize, fixedBatchSize):
+def createTimeSeriesList(targetSubName, nonTargetSubNames, sizeGoal, comparisonSubNames, keywords, commentLimit, batchSize, fixedBatchSize, knownUsers=[]):
     targetIds = getTargetIds(comparisonSubNames)
     targetUsers = getSubUsers(targetSubName, 1000)
     timeseriesTuples = []
     nonTargetUsers2D = [getSubUsers(subName, round(1000/len(nonTargetSubNames))) for subName in nonTargetSubNames]
     nonTargetUsers = [item for sublist in nonTargetUsers2D for item in sublist]
-    existingUsers = []
+    existingUsers = knownUsers
 
     for user in nonTargetUsers:
         if len(timeseriesTuples) < sizeGoal:
@@ -210,7 +209,7 @@ def createTimeSeriesList(targetSubName, nonTargetSubNames, sizeGoal, comparisonS
             if (timestamps != -1 and userName != -1):
                 existingUsers.append(userName)
                 timeseriesTuples.append((timestamps, isTarget))
-    return timeseriesTuples
+    return timeseriesTuples, existingUsers
 
 
 def fillDirectoryTextual(targetSubName, nonTargetSubNames, sizeGoal, path, testPath, comparisonSubNames, keywords, commentLimit, batchSize, fixedBatchSize):
